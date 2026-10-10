@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "AIZEN CLIENT Tools",
+    "description": "Optional script tools: calculator and saved command helper",
+    "uuid": "cc65e4a9-06c9-4b9b-8b66-0c1d7a6d1d21",
+    "version": [0, 1, 0],
+    "min_engine_version": [1, 26, 30]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "db8f81a2-6c43-4eaa-b7b1-20b5d9b3c6e1",
+      "version": [0, 1, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "4bff3c39-96a8-4a0a-9c1a-0cbfa4b7e3d8",
+      "version": [0, 1, 0],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.0.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["AIZEN"],
+    "license": "All rights reserved"
+  }
+}
