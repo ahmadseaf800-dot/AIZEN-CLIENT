@@ -1,4 +1,4 @@
-name: Build AIZEN Resource Pack
+name: Build AIZEN CLIENT
 
 on:
   push:
@@ -24,49 +24,72 @@ jobs:
       - name: Install image dependency
         run: python -m pip install --upgrade Pillow
 
-      - name: Validate manifest
+      - name: Validate manifests and script syntax
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          manifest = Path("AIZEN-CLIENT-RP/manifest.json")
-          data = json.loads(manifest.read_text(encoding="utf-8"))
-          assert data["format_version"] == 2
-          assert data["header"]["name"] == "AIZEN CLIENT"
-          assert len(data["modules"]) > 0
-          print("Manifest JSON is valid.")
+          for p in [Path("AIZEN-CLIENT-RP/manifest.json"), Path("AIZEN-CLIENT-BP/manifest.json")]:
+              data = json.loads(p.read_text(encoding="utf-8"))
+              assert data["format_version"] == 2
+              assert data["header"]["name"]
+              assert data["modules"]
+              print(f"Valid JSON manifest: {p}")
+          script = Path("AIZEN-CLIENT-BP/scripts/main.js")
+          assert script.exists() and script.stat().st_size > 100
+          print("Behavior pack script exists.")
           PY
+          node --check AIZEN-CLIENT-BP/scripts/main.js
 
-      - name: Create pack icon
+      - name: Create pack icons
         run: |
           python - <<'PY'
           from PIL import Image, ImageDraw
           from pathlib import Path
-          p = Path("AIZEN-CLIENT-RP/pack_icon.png")
-          im = Image.new("RGB", (256, 256), (15, 15, 18))
-          d = ImageDraw.Draw(im)
-          d.rounded_rectangle((12, 12, 244, 244), radius=34, outline=(238, 190, 55), width=8)
-          d.text((128, 91), "AIZEN", anchor="mm", fill=(255, 205, 65))
-          d.text((128, 145), "CLIENT", anchor="mm", fill=(245, 245, 245))
-          d.line((55, 181, 201, 181), fill=(238, 190, 55), width=5)
-          im.save(p)
+          for folder, title in [("AIZEN-CLIENT-RP", "AIZEN"), ("AIZEN-CLIENT-BP", "TOOLS")]:
+              p = Path(folder) / "pack_icon.png"
+              im = Image.new("RGB", (256, 256), (15, 15, 18))
+              d = ImageDraw.Draw(im)
+              d.rounded_rectangle((12, 12, 244, 244), radius=34, outline=(238, 190, 55), width=8)
+              d.text((128, 91), "AIZEN", anchor="mm", fill=(255, 205, 65))
+              d.text((128, 145), title, anchor="mm", fill=(245, 245, 245))
+              d.line((55, 181, 201, 181), fill=(238, 190, 55), width=5)
+              im.save(p)
           PY
 
-      - name: Package .mcpack
+      - name: Package resource pack
         run: |
           cd AIZEN-CLIENT-RP
           zip -r ../AIZEN-CLIENT.mcpack .
 
-      - name: Upload downloadable pack
+      - name: Package behavior pack
+        run: |
+          cd AIZEN-CLIENT-BP
+          zip -r ../AIZEN-CLIENT-TOOLS.mcpack .
+
+      - name: Package combined add-on
+        run: |
+          mkdir -p addon
+          cp AIZEN-CLIENT.mcpack AIZEN-CLIENT-TOOLS.mcpack addon/
+          cd addon
+          zip -r ../AIZEN-CLIENT.mcaddon .
+
+      - name: Upload installable files
         uses: actions/upload-artifact@v4
         with:
-          name: AIZEN-CLIENT-mcpack
-          path: AIZEN-CLIENT.mcpack
+          name: AIZEN-CLIENT-downloads
+          path: |
+            AIZEN-CLIENT.mcpack
+            AIZEN-CLIENT-TOOLS.mcpack
+            AIZEN-CLIENT.mcaddon
           if-no-files-found: error
 
       - name: Publish GitHub Release for version tags
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: AIZEN-CLIENT.mcpack
+          files: |
+            AIZEN-CLIENT.mcpack
+            AIZEN-CLIENT-TOOLS.mcpack
+            AIZEN-CLIENT.mcaddon
           generate_release_notes: true
