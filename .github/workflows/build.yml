@@ -16,22 +16,31 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install image dependency
+        run: python -m pip install --upgrade Pillow
+
       - name: Validate manifest
-        run: python - <<'PY'
-        import json
-        from pathlib import Path
-        manifest = Path("AIZEN-CLIENT-RP/manifest.json")
-        data = json.loads(manifest.read_text(encoding="utf-8"))
-        assert data["format_version"] == 2
-        assert data["header"]["name"] == "AIZEN CLIENT"
-        assert len(data["modules"]) > 0
-        print("Manifest JSON is valid.")
-        PY
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest = Path("AIZEN-CLIENT-RP/manifest.json")
+          data = json.loads(manifest.read_text(encoding="utf-8"))
+          assert data["format_version"] == 2
+          assert data["header"]["name"] == "AIZEN CLIENT"
+          assert len(data["modules"]) > 0
+          print("Manifest JSON is valid.")
+          PY
 
       - name: Create pack icon
         run: |
           python - <<'PY'
-          from PIL import Image, ImageDraw, ImageFont
+          from PIL import Image, ImageDraw
           from pathlib import Path
           p = Path("AIZEN-CLIENT-RP/pack_icon.png")
           im = Image.new("RGB", (256, 256), (15, 15, 18))
