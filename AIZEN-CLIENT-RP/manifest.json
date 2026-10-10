@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "AIZEN CLIENT",
+    "description": "A lightweight AIZEN resource pack for Minecraft Bedrock 1.26.30.27",
+    "uuid": "8d9d09e8-6c67-4c85-9d6e-0d8a2e2f8a10",
+    "version": [0, 1, 0],
+    "min_engine_version": [1, 26, 30]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "4b9f8c72-2ef1-4a63-b46b-ef4b0fef6a21",
+      "version": [0, 1, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["AIZEN"],
+    "license": "All rights reserved"
+  }
+}
